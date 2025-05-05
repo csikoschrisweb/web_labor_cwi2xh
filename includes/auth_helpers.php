@@ -1,33 +1,29 @@
 <?php
-require_once 'src/models/User.php';
+// Correct path using __DIR__
+require_once __DIR__ . 
+'/../src/models/User.php
+
+
+'; // Include User model for isLoggedIn check if kept
 
 /**
  * Bejelentkezett felhasználó adatai
+ * Note: Consider using User::isLoggedIn() and fetching user data directly where needed
+ * instead of this helper.
+ * Session must be started before calling this.
  */
 function getAuthenticatedUser() {
-    return isAuthenticated() ? $_SESSION['user'] : null;
-}
+    // Check using the User model's method if session is active
+    if (session_status() == PHP_SESSION_ACTIVE && User::isLoggedIn()) {
+        return $_SESSION[
+'user
 
-/**
- * Beléptetés és session mentés
- */
-function authenticateUser($email, $password) {
-    if (User::login($email, $password)) {
-        header("Location: profile.php");
-        exit;
-    } else {
-        $_SESSION['error'] = "Hibás email vagy jelszó!";
-        header("Location: login.php");
-        exit;
+'];
     }
+    return null;
 }
 
-/**
- * Kilépési folyamat
- */
-function logoutUser() {
-    destroySession();
-    header("Location: index.php");
-    exit;
-}
+// Removed authenticateUser() - Logic is now in AuthController::login() and User::login()
+// Removed logoutUser() - Logic is now in AuthController::logout() and User::logout()
+
 ?>

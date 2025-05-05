@@ -1,24 +1,32 @@
 <?php
-require_once 'config/config.php';
+require_once __DIR__ . 
+'/../../config/config.php
+';
 
 class Database {
     private static $conn;
 
     /**
-     * Adatbázis kapcsolat létrehozása
+     * Adatbázis kapcsolat létrehozása (MySQL)
      */
     public static function connect() {
         if (!isset(self::$conn)) {
             try {
+                
                 self::$conn = new PDO(
-                    "sqlsrv:Server=" . DB_HOST . ";Database=" . DB_NAME, 
+                    "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", 
                     DB_USER, 
                     DB_PASS,
-                    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, 
+                        PDO::ATTR_EMULATE_PREPARES => false, 
+                    ]
                 );
-            } catch (Exception $e) {
-                error_log("Adatbázis kapcsolat hiba: " . $e->getMessage());
-                die("Nem sikerült csatlakozni az adatbázishoz.");
+            } catch (PDOException $e) { 
+                error_log("Database connection error: " . $e->getMessage());
+                
+                die("Could not connect to the database. Please check the configuration or contact support.");
             }
         }
         return self::$conn;
@@ -28,26 +36,48 @@ class Database {
      * Lekérdezés futtatása és eredmények visszaadása
      */
     public static function fetchAll($sql, $params = []) {
-        $stmt = self::connect()->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = self::connect()->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(); 
+        } catch (PDOException $e) {
+            error_log("Database fetchAll error: " . $e->getMessage() . " SQL: " . $sql);
+            return []; 
+        }
     }
 
     /**
      * Egyetlen rekord lekérdezése
      */
     public static function fetchOne($sql, $params = []) {
-        $stmt = self::connect()->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = self::connect()->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetch(); 
+        } catch (PDOException $e) {
+            error_log("Database fetchOne error: " . $e->getMessage() . " SQL: " . $sql);
+            return null; 
+        }
     }
 
     /**
-     * Adat beszúrása vagy módosítása
+     * Adat beszúrása vagy módosítása (INSERT, UPDATE, DELETE)
      */
     public static function executeQuery($sql, $params = []) {
-        $stmt = self::connect()->prepare($sql);
-        return $stmt->execute($params);
+        try {
+            $stmt = self::connect()->prepare($sql);
+            return $stmt->execute($params); 
+        } catch (PDOException $e) {
+            error_log("Database executeQuery error: " . $e->getMessage() . " SQL: " . $sql);
+            return false; 
+        }
+    }
+
+    /**
+     * Utolsó beszúrt ID lekérése
+     */
+    public static function lastInsertId() {
+        return self::$conn ? self::$conn->lastInsertId() : null;
     }
 }
 ?>

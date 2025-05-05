@@ -8,4 +8,4 @@
     <li><strong>Kyoto, Japán</strong> – 5 nap / kulturális túra</li>
 </ul>
 
-<?php require_once 'templates/footer.php'; ?>
+

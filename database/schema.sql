@@ -1,41 +1,34 @@
--- Adatbázis létrehozása (ha még nincs)
-CREATE DATABASE utazasi_iroda;
-GO
-USE utazasi_iroda;
-GO
 
--- Felhasználók tábla
-CREATE TABLE users (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    name NVARCHAR(255) NOT NULL,
-    email NVARCHAR(255) UNIQUE NOT NULL,
-    password NVARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT GETDATE()
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-GO
 
--- Üzenetek tábla
-CREATE TABLE messages (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    name NVARCHAR(255) NOT NULL,
-    email NVARCHAR(255) NOT NULL,
+-- Messages table
+CREATE TABLE IF NOT EXISTS messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    sent_at DATETIME DEFAULT GETDATE()
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-GO
 
--- Képfeltöltések tábla
-CREATE TABLE images (
-    id INT PRIMARY KEY IDENTITY(1,1),
+-- Images table
+CREATE TABLE IF NOT EXISTS images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    file_name NVARCHAR(255) NOT NULL,
-    uploaded_at DATETIME DEFAULT GETDATE(),
+    file_name VARCHAR(255) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-GO
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Indexek és optimalizálás
-CREATE INDEX idx_users_email ON users(email);
+
 CREATE INDEX idx_messages_sent_at ON messages(sent_at);
 CREATE INDEX idx_images_uploaded_at ON images(uploaded_at);
-GO
+
+

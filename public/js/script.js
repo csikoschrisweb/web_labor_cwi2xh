@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Parallax görgetési effekt
     window.addEventListener("scroll", () => {
         document.querySelector(".parallax-bg").style.transform = `translateY(${window.scrollY * 0.4}px)`;
-    });
+    });    
 
     // Hover-effekt gombokhoz és képekhez
     document.querySelectorAll("button, .gallery img").forEach(el => {

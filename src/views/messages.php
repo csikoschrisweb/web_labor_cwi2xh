@@ -1,11 +1,14 @@
-<?php require_once 'templates/header.php'; ?>
-<h1>Beérkezett üzenetek</h1>
-
 <?php
-$messages = MessageController::getMessages();
-foreach ($messages as $msg) {
-    echo "<p><strong>{$msg['name']}</strong> ({$msg['email']}): {$msg['message']} - {$msg['sent_at']}</p>";
-}
+require_once __DIR__ . '/../controllers/MessageController.php';
+$messages = MessageController::getAllMessages();
 ?>
 
-<?php require_once 'templates/footer.php'; ?>
+<h2>Üzenetek</h2>
+<?php foreach ($messages as $msg): ?>
+    <div>
+        <strong><?= htmlspecialchars($msg['name']) ?></strong> (<?= htmlspecialchars($msg['email']) ?>) <br>
+        <?= nl2br(htmlspecialchars($msg['message'])) ?>
+    </div>
+    <hr>
+    
+<?php endforeach; ?>

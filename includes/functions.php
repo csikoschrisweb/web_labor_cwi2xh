@@ -2,27 +2,54 @@
 /**
  * Biztonságos bemenet tisztítása
  */
-function sanitizeInput($data) {
-    return htmlspecialchars(trim($data));
+function sanitizeOutput($data) {
+    
+    return htmlspecialchars($data, ENT_QUOTES, 
+'UTF-8
+');
 }
 
 /**
  * Hibák megjelenítése
  */
 function displayError() {
-    if (isset($_SESSION['error'])) {
-        echo "<p class='error'>" . $_SESSION['error'] . "</p>";
-        unset($_SESSION['error']);
+    if (session_status() == PHP_SESSION_ACTIVE && isset($_SESSION[
+'error
+'])) {
+        // Sanitize the error message before echoing
+        echo "<p class=
+'error
+'>" . sanitizeOutput($_SESSION[
+'error
+']) . "</p>";
+        // Unset the message after displaying
+        unset($_SESSION[
+'error
+']);
     }
 }
 
 /**
  * Sikerek megjelenítése
+ * Ensures session is active and sanitizes output.
  */
 function displaySuccess() {
-    if (isset($_SESSION['success'])) {
-        echo "<p class='success'>" . $_SESSION['success'] . "</p>";
-        unset($_SESSION['success']);
+    // Check if session is active before accessing $_SESSION
+    if (session_status() == PHP_SESSION_ACTIVE && isset($_SESSION[
+'success
+'])) {
+        // Sanitize the success message before echoing
+        echo "<p class=
+'success
+'>" . sanitizeOutput($_SESSION[
+'success
+']) . "</p>";
+        // Unset the message after displaying
+        unset($_SESSION[
+'success
+']);
     }
 }
+
+
 ?>

@@ -1,21 +1,31 @@
 <?php
-require_once 'config/db.php';
+// src/models/Message.php
+
+require_once __DIR__ . '/../../config/db.php'; // Betöltjük az adatbázis kapcsolatot
 
 class Message {
-    /**
-     * Új üzenet mentése az adatbázisba
-     */
-    public static function saveMessage($name, $email, $message) {
-        $sql = "INSERT INTO messages (name, email, message, sent_at) VALUES (?, ?, ?, NOW())";
-        return executeQuery($sql, [$name, $email, $message]);
+
+    // Új üzenet létrehozása
+    public static function create($name, $email, $message) {
+        global $pdo;
+        if (!$pdo) {
+            die("Hiba: Nincs adatbázis kapcsolat (Message::create)!");
+        }
+
+        $sql = "INSERT INTO messages (name, email, message) VALUES (?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([$name, $email, $message]);
     }
 
-    /**
-     * Üzenetek lekérése az adatbázisból
-     */
-    public static function fetchMessages() {
+    // Az összes üzenet lekérése
+    public static function getAll() {
+        global $pdo;
+        if (!$pdo) {
+            die("Hiba: Nincs adatbázis kapcsolat (Message::getAll)!");
+        }
+
         $sql = "SELECT * FROM messages ORDER BY sent_at DESC";
-        return fetchAll($sql);
+        $stmt = $pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-?>
